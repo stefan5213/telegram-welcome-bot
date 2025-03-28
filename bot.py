@@ -2,7 +2,7 @@ import logging
 import json
 import os
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, InputMediaPhoto
-from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, ChatJoinRequestHandler
+from telegram.ext import ApplicationBuilder, CommandHandler, ContextTypes, ChatJoinRequestHandler, MessageHandler, filters
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
@@ -89,6 +89,7 @@ app = ApplicationBuilder().token(BOT_TOKEN).build()
 
 app.add_handler(CommandHandler("set_message", set_message))
 app.add_handler(ChatJoinRequestHandler(on_join_request))
+app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
 app.add_handler(CommandHandler("start", lambda u, c: u.message.reply_text("Ботот е активен.")))
 app.add_handler(CommandHandler("help", lambda u, c: u.message.reply_text("Користи /set_message за да поставиш нова порака.")))
 app.add_handler(CommandHandler("reset", lambda u, c: (save_message({"text": "Добредојде!", "image": None, "buttons": []}), u.message.reply_text("Пораката е ресетирана."))))
@@ -96,24 +97,5 @@ app.add_handler(CommandHandler("show", lambda u, c: u.message.reply_text(json.du
 app.add_handler(CommandHandler("ping", lambda u, c: u.message.reply_text("pong")))
 app.add_handler(CommandHandler("id", lambda u, c: u.message.reply_text(f"Твојот Telegram ID: {u.effective_user.id}")))
 app.add_handler(CommandHandler("chatid", lambda u, c: u.message.reply_text(f"Chat ID: {u.effective_chat.id}")))
-
-app.add_handler(CommandHandler("echo", lambda u, c: u.message.reply_text(u.message.text)))
-app.add_handler(CommandHandler("json", lambda u, c: u.message.reply_text(str(u.message.to_dict()))))
-app.add_handler(CommandHandler("photo", lambda u, c: u.message.reply_photo(photo=open("photo.jpg", "rb"))))
-app.add_handler(CommandHandler("text", lambda u, c: u.message.reply_text("Текст порака!")))
-
-app.add_handler(CommandHandler("buttons", lambda u, c: u.message.reply_text("Копчиња!", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Кликни ме", url="https://example.com")]]))))
-
-app.add_handler(CommandHandler("image", lambda u, c: u.message.reply_photo(photo="https://placekitten.com/400/300", caption="Маче!")))
-
-app.add_handler(CommandHandler("fulltest", lambda u, c: u.message.reply_photo(photo="https://placekitten.com/400/300", caption="Ова е комплетна порака со маче!", reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("Веб", url="https://example.com")]]))))
-
-app.add_handler(CommandHandler("stop", lambda u, c: u.message.reply_text("Немам дозвола да се исклучам :)")))
-
-app.add_handler(CommandHandler("clear", lambda u, c: u.message.reply_text("Немам функција за бришење на пораки.")))
-
-app.add_handler(CommandHandler("link", lambda u, c: u.message.reply_text("https://t.me/yourchannel")))
-
-app.add_handler(CommandHandler("confirm", lambda u, c: u.message.reply_text("Потврдено!")))
 
 app.run_polling()
