@@ -1,8 +1,0 @@
-{
-    "name": "telegram-welcome-bot",
-    "version": "1.0.0",
-    "main": "bot.py",
-    "scripts": {
-      "start": "python bot.py"
-    }
-  }
